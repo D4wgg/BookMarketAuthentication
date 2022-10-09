@@ -18,7 +18,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = request.getParameter("token");
-        TokenAuthentication tokenAuthentication = new TokenAuthentication(token);
+        var tokenAuthentication = new TokenAuthentication(token);
 
         if (token == null) {
             tokenAuthentication.setAuthenticated(false);

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -15,10 +16,9 @@ import javax.validation.constraints.NotNull;
 @Schema(name = "Форма логина")
 public class LoginDto {
 
-    @NotNull
-    @NotEmpty(message = "Login can not be empty and null")
-    @JsonProperty(value = "Логин")
-    private String login;
+    @Email(message = "email not valid")
+    @JsonProperty(value = "Почта")
+    private String email;
 
     @NotNull
     @NotEmpty(message = "Password can not be empty and null")

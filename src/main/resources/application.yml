@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+
+  jooq:
+    sql-dialect: org.hibernate.dialect.PostgreSQL95Dialect
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  mail:
+    host: pop.gmail.com
+    port: 587
+    username: dwg3kelo@gmail.com
+    password: mvrszkspwtyyzxcf
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs

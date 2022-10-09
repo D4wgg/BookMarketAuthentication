@@ -2,7 +2,8 @@ package ru.dawgg.bookmarket.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.dawgg.bookmarket.model.characteristic.Role;
 import ru.dawgg.bookmarket.model.characteristic.State;
@@ -10,29 +11,31 @@ import ru.dawgg.bookmarket.model.characteristic.State;
 import javax.persistence.*;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "site_users")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Builder
+@EqualsAndHashCode
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
-    @Column(name = "login")
-    private String login;
-
+    @Column(name = "email")
+    private String email;
     @Column(name = "hash_password")
     private String hashPassword;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "surname")
     private String surname;
+    @Column(name = "locked")
+    private boolean locked;
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Enumerated(EnumType.STRING)
     private Role role;

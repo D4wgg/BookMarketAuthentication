@@ -47,3 +47,9 @@ services:
       KAFKA_BROKERCONNECT: 'kafka:29092'
       JVM_OPTS: -Xms32M -Xmx64M
       SERVER_SERVLET_CONTEXTPATH: /
+
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
