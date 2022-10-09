@@ -3,17 +3,20 @@ package ru.dawgg.bookmarket.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "token")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Builder
+@EqualsAndHashCode
 public class Token {
 
     @Id
@@ -24,6 +27,6 @@ public class Token {
     private String value;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 }

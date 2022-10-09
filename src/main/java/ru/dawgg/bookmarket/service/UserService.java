@@ -6,10 +6,9 @@ import ru.dawgg.bookmarket.model.User;
 import java.util.List;
 
 public interface UserService {
-
     void signUp(UserDto userDto);
-
+    void save(User user);
     List<UserDto> findAll();
-
-    UserDto findOneById(Long id);
+    User findByEmail(String email);
+    void enableUser(String token);
 }

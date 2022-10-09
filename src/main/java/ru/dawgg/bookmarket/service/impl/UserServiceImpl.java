@@ -4,39 +4,52 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.dawgg.bookmarket.dto.UserDto;
-import ru.dawgg.bookmarket.exception.InnerApiException;
+import ru.dawgg.bookmarket.exception.UserAlreadyExistException;
+import ru.dawgg.bookmarket.exception.UserNotFoundException;
 import ru.dawgg.bookmarket.model.User;
 import ru.dawgg.bookmarket.model.characteristic.Role;
 import ru.dawgg.bookmarket.model.characteristic.State;
 import ru.dawgg.bookmarket.repository.UserRepository;
+import ru.dawgg.bookmarket.service.ConfirmationEmailTokenService;
 import ru.dawgg.bookmarket.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ru.dawgg.bookmarket.exception.ApiEntityNotFoundException.USER_NOT_FOUND_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ConfirmationEmailTokenService emailTokenService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void signUp(UserDto userDto) {
-        userRepository.save(User.builder()
-                .login(userDto.getLogin())
-                .hashPassword(passwordEncoder.encode(userDto.getPassword()))
-                .name(userDto.getName())
-                .surname(userDto.getSurname())
-                .role(Role.USER)
-                .state(State.ACTIVE)
-                .build());
+        var user = buildUser(userDto);
+        checkIfUserAlreadyExists(user);
+//        emailTokenService.confirmUserEmail(user);
+    }
+    @Override
+    public void enableUser(String token) {
+        var confirmationToken = emailTokenService.confirmToken(token);
+        var email = confirmationToken.getUser().getEmail();
+        userRepository.enableUser(email);
+
+        var user = findByEmail(email);
+        save(user);
     }
 
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
                 .map(user -> mapper.map(user, UserDto.class))
@@ -44,14 +57,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findOneById(Long id) {
-        Optional<User> userCandidate = userRepository.findById(id);
-        User user = null;
+    public User findByEmail(String email) {
+        return userRepository.findOneByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+    }
 
-        if (userCandidate.isPresent()) {
-            user = userCandidate.get();
-        } else throw new InnerApiException(USER_NOT_FOUND_EXCEPTION);
+    private User buildUser(UserDto userDto) {
+        return User.builder()
+                .email(userDto.getEmail())
+                .hashPassword(passwordEncoder.encode(userDto.getPassword()))
+                .name(userDto.getName())
+                .surname(userDto.getSurname())
+                .role(Role.USER)
+                .state(State.ACTIVE)
+                .locked(false)
+                .enabled(false)
+                .build();
+    }
 
-        return mapper.map(user, UserDto.class);
+    private void checkIfUserAlreadyExists(User user) {
+        if (userRepository.findOneByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistException(user.getEmail());
+        }
     }
 }
