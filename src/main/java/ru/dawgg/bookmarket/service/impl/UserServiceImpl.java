@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     public void signUp(UserDto userDto) {
         var user = buildUser(userDto);
         checkIfUserAlreadyExists(user);
-//        emailTokenService.confirmUserEmail(user);
+        emailTokenService.confirmUserEmail(user);
     }
     @Override
     public void enableUser(String token) {
@@ -79,5 +79,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findOneByEmail(user.getEmail()).isPresent()) {
             throw new UserAlreadyExistException(user.getEmail());
         }
+        save(user);
     }
 }
