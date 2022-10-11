@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dawgg.bookmarket.dto.UserDto;
-import ru.dawgg.bookmarket.service.UserService;
+import ru.dawgg.bookmarket.service.SignUpService;
 import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -20,17 +20,17 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/v1")
 public class SignUpController {
 
-    private final UserService userService;
+    private final SignUpService signUpService;
 
     @PostMapping("/signUp")
     public ResponseEntity<Void> signUserUp(@RequestBody @Valid UserDto userDto) {
-        userService.signUp(userDto);
+        signUpService.signUp(userDto);
         return new ResponseEntity<>(OK);
     }
 
     @GetMapping("/confirm")
     public ResponseEntity<Void> confirmEmailToken(@RequestParam String token) {
-        userService.enableUser(token);
+        signUpService.activateUserAccount(token);
         return new ResponseEntity<>(OK);
     }
 }

@@ -9,7 +9,6 @@ import ru.dawgg.bookmarket.model.ConfirmationEmailToken;
 import ru.dawgg.bookmarket.model.User;
 import ru.dawgg.bookmarket.repository.ConfirmationEmailTokenRepository;
 import ru.dawgg.bookmarket.service.ConfirmationEmailTokenService;
-import ru.dawgg.bookmarket.service.EmailBuilder;
 import ru.dawgg.bookmarket.service.EmailSender;
 
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ import java.util.UUID;
 public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailTokenService {
     private final ConfirmationEmailTokenRepository repository;
     private final EmailSender emailSender;
-    private final EmailBuilder emailBuilder;
 
     @Override
     public void confirmUserEmail(User user) {
@@ -29,10 +27,7 @@ public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailToken
         save(emailToken);
 
         String link = "http://localhost:8080/api/v1/confirm?token=" + token;
-        emailSender.send(
-                user.getEmail(),
-                emailBuilder.buildEmail(user.getName(), link)
-                );
+        emailSender.send(user.getEmail(), link);
     }
 
     @Override
