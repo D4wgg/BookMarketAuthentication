@@ -23,7 +23,6 @@ public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
-    private final ModelMapper mapper;
 
     @Override
     public boolean login(LoginDto loginDto, HttpServletResponse response) {
@@ -41,7 +40,6 @@ public class LoginServiceImpl implements LoginService {
                 .build();
         tokenRepository.save(token);
         createCookie(response, user.getEmail(), token.getValue(), user.getName());
-//        return mapper.map(token, TokenDto.class);
         return true;
     }
 

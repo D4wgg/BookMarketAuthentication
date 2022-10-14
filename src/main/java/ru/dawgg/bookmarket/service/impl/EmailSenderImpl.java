@@ -24,8 +24,8 @@ public class EmailSenderImpl implements EmailSender {
         message.setTo(to);
         message.setSubject("Confirm your email");
         message.setText(email);
-
         mailSender.send(message);
-        System.out.println("Message has been sent");
+
+        log.info("Message has been sent");
     }
 }

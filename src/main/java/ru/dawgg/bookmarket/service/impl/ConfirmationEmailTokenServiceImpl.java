@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dawgg.bookmarket.exception.ConfirmationTokenException;
-import ru.dawgg.bookmarket.exception.TokenNotFoundException;
 import ru.dawgg.bookmarket.model.ConfirmationEmailToken;
 import ru.dawgg.bookmarket.model.User;
 import ru.dawgg.bookmarket.repository.ConfirmationEmailTokenRepository;
@@ -71,6 +70,6 @@ public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailToken
     @Override
     public ConfirmationEmailToken find(String token) {
         return repository.findByToken(token)
-                .orElseThrow(TokenNotFoundException::new);
+                .orElseThrow(() -> new ConfirmationTokenException("confirmation token not found"));
     }
 }

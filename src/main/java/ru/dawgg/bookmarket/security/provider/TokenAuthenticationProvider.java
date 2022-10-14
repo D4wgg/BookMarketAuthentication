@@ -1,7 +1,6 @@
 package ru.dawgg.bookmarket.security.provider;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -19,7 +18,6 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
     private final UserDetailsService userDetailsService;
 
     @Override
-    @SneakyThrows
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         var tokenAuthentication = (TokenAuthentication) authentication;
         var token = tokenRepository.findOneByValue(tokenAuthentication.getName())

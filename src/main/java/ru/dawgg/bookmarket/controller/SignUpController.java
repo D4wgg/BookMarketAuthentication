@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dawgg.bookmarket.dto.UserDto;
+import ru.dawgg.bookmarket.repository.ConfirmationEmailTokenRepository;
 import ru.dawgg.bookmarket.service.SignUpService;
 import javax.validation.Valid;
 
@@ -21,6 +22,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class SignUpController {
 
     private final SignUpService signUpService;
+    private final ConfirmationEmailTokenRepository repository;
 
     @PostMapping("/signUp")
     public ResponseEntity<Void> signUserUp(@RequestBody @Valid UserDto userDto) {
@@ -29,8 +31,16 @@ public class SignUpController {
     }
 
     @GetMapping("/confirm")
-    public ResponseEntity<Void> confirmEmailToken(@RequestParam String token) {
+    public String confirmEmailToken(@RequestParam String token) {
         signUpService.activateUserAccount(token);
-        return new ResponseEntity<>(OK);
+        return "redirect:/api/v1/login";
+    }
+
+    @GetMapping("/findToken")
+    public String findToken(@RequestParam String token) {
+        if (repository.findByToken(token).isPresent()) {
+            return "Found";
+        }
+        return "Not found";
     }
 }
