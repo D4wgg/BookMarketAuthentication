@@ -26,7 +26,6 @@ public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailToken
         var token = UUID.randomUUID().toString();
         var emailToken = buildEmailToken(user, token);
         save(emailToken);
-
         String link = "http://localhost:8080/api/v1/confirm?emailToken=" + token;
         emailSender.send(user.getEmail(), link);
     }
