@@ -28,7 +28,6 @@ public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailToken
         save(emailToken);
 
         String link = "http://localhost:8080/api/v1/confirm?emailToken=" + token;
-//        String text = emailBuilder.buildEmail(user.getName(), link);
         emailSender.send(user.getEmail(), link);
     }
 
