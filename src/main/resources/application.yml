@@ -8,6 +8,9 @@ spring:
     username: postgres
     password: postgres
 
+  jooq:
+    sql-dialect: org.hibernate.dialect.PostgreSQL95Dialect
+
   jpa:
     hibernate:
       ddl-auto: update
