@@ -1,6 +1,7 @@
 package ru.dawgg.bookmarket.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dawgg.bookmarket.exception.ConfirmationTokenException;
@@ -20,12 +21,14 @@ public class ConfirmationEmailTokenServiceImpl implements ConfirmationEmailToken
     private final EmailSender emailSender;
 
     @Override
+    @SneakyThrows
     public void confirmUserEmail(User user) {
         var token = UUID.randomUUID().toString();
         var emailToken = buildEmailToken(user, token);
         save(emailToken);
 
-        String link = "http://localhost:8080/api/v1/confirm?token=" + token;
+        String link = "http://localhost:8080/api/v1/confirm?emailToken=" + token;
+//        String text = emailBuilder.buildEmail(user.getName(), link);
         emailSender.send(user.getEmail(), link);
     }
 

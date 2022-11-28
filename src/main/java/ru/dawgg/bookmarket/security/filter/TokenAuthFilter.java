@@ -16,10 +16,10 @@ import java.io.IOException;
 public class TokenAuthFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 
-        String token = request.getParameter("token");
+        String token = req.getParameter("token");
         var tokenAuthentication = new TokenAuthentication(token);
 
         if (token == null) {
@@ -27,6 +27,6 @@ public class TokenAuthFilter extends OncePerRequestFilter {
         } else {
             SecurityContextHolder.getContext().setAuthentication(tokenAuthentication);
         }
-        filterChain.doFilter(request, response);
+        chain.doFilter(req, resp);
     }
 }
