@@ -4,7 +4,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.dawgg.bookmarket.dto.LoginDto;
@@ -39,7 +38,7 @@ public class LoginServiceImpl implements LoginService {
                 .value(RandomStringUtils.random(randomStringLength, true, true))
                 .build();
         tokenRepository.save(token);
-        createCookie(response, user.getEmail(), token.getValue(), user.getName());
+        addCookie(response, user.getEmail(), token.getValue(), user.getName());
         return true;
     }
 
@@ -47,16 +46,18 @@ public class LoginServiceImpl implements LoginService {
         return passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword());
     }
 
-    private void createCookie(HttpServletResponse response, String email, String token, String userFirstName) {
-        var emailCookie = new Cookie("email", email);
-        emailCookie.setMaxAge(7 * 24 * 60 * 60);
-        var tokenCookie = new Cookie("token", token);
-        tokenCookie.setMaxAge(7 * 24 * 60 * 60);
-        var userNameCookie = new Cookie("userName", userFirstName);
-        userNameCookie.setMaxAge(7 * 24 * 60 * 60);
+    private void addCookie(HttpServletResponse response, String email, String token, String userFirstName) {
+        int weekPerSeconds = 7 * 24 * 60 * 60;
 
-        response.addCookie(emailCookie);
-        response.addCookie(tokenCookie);
-        response.addCookie(userNameCookie);
+        response.addCookie(createCookie("email", email, weekPerSeconds));
+        response.addCookie(createCookie("token", token, weekPerSeconds));
+        response.addCookie(createCookie("name", userFirstName, weekPerSeconds));
+    }
+
+    private Cookie createCookie(String name, String value, int expirationTime) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(expirationTime);
+        cookie.setSecure(true);
+        return cookie;
     }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.dawgg.bookmarket.dto.UserDto;
 import ru.dawgg.bookmarket.exception.UserAlreadyExistException;
 import ru.dawgg.bookmarket.exception.UserNotFoundException;
@@ -12,7 +11,6 @@ import ru.dawgg.bookmarket.model.User;
 import ru.dawgg.bookmarket.model.characteristic.Role;
 import ru.dawgg.bookmarket.model.characteristic.State;
 import ru.dawgg.bookmarket.repository.UserRepository;
-import ru.dawgg.bookmarket.service.ConfirmationEmailTokenService;
 import ru.dawgg.bookmarket.service.UserService;
 
 import java.util.List;
@@ -23,16 +21,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final ConfirmationEmailTokenService emailTokenService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
     @Override
     public void enableUser(String email) {
         userRepository.enableUser(email);
-
-        var user = findByEmail(email);
-        save(user);
     }
 
     @Override
