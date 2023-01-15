@@ -2,8 +2,12 @@ package ru.dawgg.bookmarket.service.impl;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.dawgg.bookmarket.dto.LoginDto;
@@ -15,6 +19,9 @@ import ru.dawgg.bookmarket.repository.TokenRepository;
 import ru.dawgg.bookmarket.repository.UserRepository;
 import ru.dawgg.bookmarket.service.LoginService;
 
+import java.util.Date;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
@@ -23,40 +30,49 @@ public class LoginServiceImpl implements LoginService {
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
 
+    @Value("${time.expiresAt}")
+    private String expirationTime;
+
+    @Value("${algorithm.secret}")
+    private String secret;
+
     @Override
     public boolean login(LoginDto loginDto, HttpServletResponse response) {
         var user = userRepository.findOneByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new UserNotFoundException(loginDto.getEmail()));
 
-        if (!userPasswordMatches(user, loginDto)) {
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword())) {
             throw new IncorrectPasswordException();
         }
 
-        final int randomStringLength = 10;
         var token = Token.builder()
                 .user(user)
-                .value(RandomStringUtils.random(randomStringLength, true, true))
+                .value(createJwt(user))
                 .build();
         tokenRepository.save(token);
-        addCookie(response, user.getEmail(), token.getValue(), user.getName());
+
+        var cookie = createCookie(token.getValue());
+        response.addCookie(cookie);
         return true;
     }
 
-    private boolean userPasswordMatches(User user, LoginDto loginDto) {
-        return passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword());
+    private String createJwt(User user) {
+        Map<String, String> map = Map.of(
+                "email", user.getEmail(),
+                "role", user.getRole().name(),
+                "name", user.getName()
+        );
+
+        return JWT.create()
+                .withSubject(user.getHashPassword())
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(expirationTime)))
+                .withClaim("user", map)
+                .sign(Algorithm.HMAC256(secret.getBytes()));
     }
 
-    private void addCookie(HttpServletResponse response, String email, String token, String userFirstName) {
-        int weekPerSeconds = 7 * 24 * 60 * 60;
-
-        response.addCookie(createCookie("email", email, weekPerSeconds));
-        response.addCookie(createCookie("token", token, weekPerSeconds));
-        response.addCookie(createCookie("name", userFirstName, weekPerSeconds));
-    }
-
-    private Cookie createCookie(String name, String value, int expirationTime) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setMaxAge(expirationTime);
+    private Cookie createCookie(String jwt) {
+        Cookie cookie = new Cookie("token", jwt);
+        cookie.setMaxAge(Integer.parseInt(expirationTime));
         cookie.setSecure(true);
         return cookie;
     }

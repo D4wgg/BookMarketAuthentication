@@ -21,7 +21,7 @@ public class LoginController {
     @PostMapping()
     public String login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         if (loginService.login(loginDto, response)) {
-            return "redirect:/funcapi/v1/authors";
+            return "redirect:/funcapi/v1/initialization";
         }
         return "redirect:/api/v1/login";
     }

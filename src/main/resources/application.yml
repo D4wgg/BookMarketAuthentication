@@ -37,3 +37,9 @@ spring:
 springdoc:
   api-docs:
     path: /v3/api-docs
+
+time:
+  expiresAt: 604800000
+
+algorithm:
+  secret: secret
